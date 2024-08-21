@@ -1,0 +1,323 @@
+import { useContext, useEffect, useState } from "react"
+import styled, { keyframes } from "styled-components"
+import { CardContext } from "../../../context/CardContext"
+import { Link } from "react-router-dom"
+
+export const CardList = () => {
+
+
+    const [cards, setCards] = useState({
+        // Atributos do objeto 
+        loaded_pokemons: [],
+        pokemon_details: [],
+        // Contador para atualizar offset do loadMoreCards
+        contador_cards: 0
+        //Listando 10 pokemons: https://pokeapi.co/api/v2/pokemon?limit=10&offset=0 - A cada atualização da lista, incrementar o offset em 10 significa que, a partir do primeiro, cada vez que a página for atualizada, será pulado 10 pokemon's. Isso faz com que o GET não retorne pokemon's repetidos.
+    })
+
+    // Compartilhando o contexto das cartas individuais
+
+    const { selectedCard, setSelectedCard } = useContext(CardContext);
+
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false, card_id: null, card_name: null });
+
+
+    useEffect(() => {
+        async function fetchData() {
+            const data = await getCards()
+            setCards({
+                loaded_pokemons: [...data],
+                pokemon_details: [],
+                contador_cards: 10
+            })
+
+        }
+
+        fetchData();
+    }, [])
+
+
+    // Usando a description_url para acessar o objeto card indiv que fica dentro do retorno da função getCards()
+
+    useEffect(() => {
+        async function getObjectCard() {
+            const objectData = await Promise.all(cards.loaded_pokemons.map(async (card) => {
+                const response = await fetch(card.description_url);
+                const data = await response.json();
+                //console.log("Nome : " + data.name)
+                //console.log("Sprite : " + data.sprites.front_default)
+                //console.log(data)
+                return await data;
+            }))
+            setCards(cards => ({
+                ...cards,
+                pokemon_details: [...objectData]
+            }))
+        }
+        getObjectCard();
+
+    }, [cards.loaded_pokemons])
+
+
+
+    async function getCards() {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10&offset=0')
+        const data = await response.json()
+        const array_pokemons = data.results.map((card) => ({
+            name: card.name,
+            description_url: card.url
+        }));
+        return array_pokemons
+    }
+
+    // async function getAbilityDescription() {
+    //     const response = await fetch("https://pokeapi.co/api/v2/ability/67/")
+    //     const data = await response.json()
+    //     console.log(data)
+    // }
+
+    async function loadMoreCards() {
+
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10&offset=${cards.contador_cards}`)
+        const data = await response.json()
+        console.log("cont: " + cards.contador_cards)
+        const array_pokemons = data.results.map((card) => ({
+            name: card.name,
+            description_url: card.url
+        }));
+        console.log(array_pokemons);
+        return setCards(cards => ({
+            ...cards,
+            contador_cards: cards.contador_cards + 10,
+            loaded_pokemons: [...cards.loaded_pokemons, ...array_pokemons]
+        }))
+
+    }
+
+    const handleRenderCardClick = (card) => {
+        // Lista de movimentos (moves) data.moves[i].move.name e move.url
+        // Lista de habilidades (abilities) - Nome e descrição - Acessar a url da habilidade e pegar o atributo - effect_entries : effect. Como os pokemon's possuem mais de uma habilidade, é necessário que este atributo receba um array [habilidade,descricao_da_habilidade]. data.abilities[i].ability.name e .ability.url
+        // Tipo do pokemon (type) - https://pokeapi.co/api/v2/type/1/
+        // Imagem do pokemon - data.sprites
+        const card_url = cards.loaded_pokemons[card.id - 1].description_url
+        const selectedCard = {
+            ...card,
+            activeStatus: true,
+            sprite: card.sprites.front_default
+        }
+        console.log(selectedCard)
+        setSelectedCard(selectedCard)
+    }
+
+
+    const handleOnMouseMove = (e, card_id, card_name) => {
+        const { clientX, clientY } = e;
+        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true, card_id: card_id, card_name: card_name })
+        //console.log('Name: ', card_name)
+    }
+    // Filtro de tipo de pokemon aqui na exibição
+
+    const handleOnMouseLeave = () => {
+        setTooltipPosition((prevState) => ({ ...prevState, activeStatus: false, card_id: null, card_name: null }));
+        //console.log('Mouse saiu da LI')
+    }
+
+    return (
+        <>
+            <Container className="container">
+                <Header>
+                    <img className="pokemon-logo" src="/images/pokemon-logo.png" alt="Logo" />
+                </Header>
+                <Div>
+                    <div className="board-cards">
+                        <ul>
+                            {cards.pokemon_details.map((card) => {
+                                return (
+                                    <>
+                                        <li className="item" key={card.id} onMouseMove={(e) => handleOnMouseMove(e, card.id, card.name)} onMouseLeave={handleOnMouseLeave} onClick={() => handleRenderCardClick(card)}>
+                                            <img src={card.sprites.front_default} alt={card.name} />
+                                            <p>Pokémon #{card.id}</p>
+                                            {tooltipPosition.activeStatus && (
+                                                <Tooltip className={`${tooltipPosition.activeStatus ? 'active' : ''}`} style={{ top: tooltipPosition.top, left: tooltipPosition.left }}>
+                                                    {tooltipPosition.card_name}
+                                                    <br />Click for Details
+                                                </Tooltip>
+                                            )}
+                                        </li></>
+                                )
+                            })}
+                        </ul>
+                        <button onClick={() => {
+                            loadMoreCards();
+                            //console.log("Contador para mudar o offset da requisição GET" + cards.contador_cards)
+                            console.log(cards.pokemon_details)
+                        }}>Clique para carregar mais 10 Pokemon's</button>
+                    </div>
+                    <div className={`exibition-card ${selectedCard.activeStatus ? 'active' : ''}`}>
+                        <img className="img-zoom" src={selectedCard.sprite} alt={selectedCard.name} />
+                        <p>{selectedCard.name}</p>
+                        <button>
+                            <Link to={`/card/1`}> Clique para atualizar</Link>
+                        </button>
+                    </div>
+
+                </Div>
+            </Container>
+        </>
+    )
+}
+
+//Styled-components
+
+//Primeira página - Item Pokemon : estilizar :hover do pokemon exibindo o pokemon-id com uma transition, exibindo um balão de dialogo; ao clicar, aparecerá uma carta ao lado contendo o nome do pokemon e o botão more-details; 
+
+const Container = styled.div`
+    display:flex;
+    flex-direction:column;
+    min-height: 100vh;
+`
+const Header = styled.header`
+    display:flex;
+    justify-content:center;
+    max-width:100vw;
+
+    .pokemon-logo {
+        width:240px;
+    }
+
+`
+const Div = styled.div`
+
+
+    display:grid;
+    grid-template-columns: repeat(2,45%);
+    //flex-direction:column;
+    background-color:lightblue;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-grow:1;
+
+    .board-cards {
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+    }
+
+    ul {
+        list-style-type:none;
+        display:grid;
+        grid-template-columns: repeat(5,110px);
+        justify-content:center;
+        margin: 0;
+        padding: 15px;
+        border:1px solid black;
+        flex-wrap:wrap;
+        height: 400px;
+        overflow-y:scroll;
+        scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
+        scrollbar-color: #888 #ffffff; /* Define as cores do thumb e do trilho */
+        gap:10px;
+    }
+    
+    .item {
+        //position:relative;
+        display:flex;
+        flex-direction:column;
+        max-width: 120px;
+        height:160px;
+        max-height: 160px;
+        background-color: white;
+        font-size: 18px;
+        border: 1px solid black;
+        text-align:center;
+        //margin: 10px;
+        padding:3px;
+        border-radius: 4px;
+
+    }
+    
+
+    .item img{
+        background-color:lightblue;
+        padding: 1px;
+        width: auto;
+        height: auto;
+    }
+
+    .item li p {
+        background-color:lightblue;
+    }
+
+    .exibition-card {
+         // Exibição da card
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        background-color:white;
+        opacity: 0;
+        
+    }
+    .exibition-card .img-zoom {
+        width:180px;
+        height:180px;
+    }
+
+    .exibition-card.active {
+        opacity: 1;
+    }
+    
+   
+
+    
+
+`
+const Tooltip = styled.div`
+    width:130px;
+    position:fixed;
+    background-color: white;
+    border: 5px solid black;
+    color:black;
+    padding:5px;
+    border-radius:5px;
+    white-space:no-wrap;
+    pointer-events:none;
+    transform: translate(30%,-100%);
+    // transition: opacity 1s ease, transform 1s ease;
+    // opacity: 0;
+
+    // &.active {
+    //     opacity: 1;
+    //     transform: translate(-50%, -110%);
+    // }
+
+    &::after {
+        content: '';
+        color:black;
+        position: absolute;
+        left:20px;
+        bottom: 30px; /* Ajuste para colocar a seta na parte inferior */
+        transform: translate(-100%);
+        rotate: 0deg;
+        border-width: 10px;
+        border-style: dotted;
+        border-color: transparent transparent transparent black; /* Define a cor da seta */
+        //Adicionando uma animação para a seta
+        animation: moveUpDown 1.5s ease-in-out infinite
+    }
+
+    
+    
+    @keyframes moveUpDown {
+        0%, 100% {
+            transform: translateX(-50%) translateY(0); /* Posição inicial e final */
+        }
+        50% {
+            transform: translateX(-50%) translateX(-5px); /* Movimento para cima */
+        }
+    }
+`
+
+
+// TAREFAS - Alterar a <ul> para responder a responsividade sem sumir as cartas; achar as fontes para titles;
