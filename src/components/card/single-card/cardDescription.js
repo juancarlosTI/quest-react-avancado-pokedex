@@ -44,7 +44,7 @@ export const SingleCard = () => {
     // }
 
     //getAbility();
-    console.log(abilities)
+    //console.log(abilities)
 
     return (
         <>
@@ -52,7 +52,7 @@ export const SingleCard = () => {
             <Container>
 
                 <Div>
-                    <p>Description of the Pokemon card.</p>
+                    
                     <div className="pokemon-image">
                         <img src={selectedCard.sprite} alt={selectedCard.name} />
                         <p>{selectedCard.name}</p>

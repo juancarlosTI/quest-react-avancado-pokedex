@@ -1,15 +1,19 @@
 import './App.css';
 import styled, { keyframes } from 'styled-components';
 import { AppRoutes } from './pages/routes';
-
+import { ThemesProvider, ThemeContext } from './context/ToggleBtnContext'
+import { useContext } from 'react';
 
 function App() {
+  const { theme } = useContext(ThemeContext);
   return (
+    
     <>
       <div>
+        <ThemesProvider theme={theme}>
           <AppRoutes />
+        </ThemesProvider>
       </div>
-      {/* <P><Ponto>.</Ponto><Ponto>.</Ponto><Ponto>.</Ponto></P> */}
     </>
   );
 }

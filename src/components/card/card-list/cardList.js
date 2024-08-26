@@ -2,9 +2,12 @@ import { useContext, useEffect, useState } from "react"
 import styled, { keyframes } from "styled-components"
 import { CardContext } from "../../../context/CardContext"
 import { Link } from "react-router-dom"
+import { ThemeButton } from "../../buttonChangeTheme/btnChangeTheme"
+import { ThemeContext, ThemesProvider } from "../../../context/ToggleBtnContext"
 
 export const CardList = () => {
 
+    const { theme } = useContext(ThemeContext);
 
     const [cards, setCards] = useState({
         // Atributos do objeto 
@@ -15,8 +18,8 @@ export const CardList = () => {
         //Listando 10 pokemons: https://pokeapi.co/api/v2/pokemon?limit=10&offset=0 - A cada atualização da lista, incrementar o offset em 10 significa que, a partir do primeiro, cada vez que a página for atualizada, será pulado 10 pokemon's. Isso faz com que o GET não retorne pokemon's repetidos.
     })
 
-    // Compartilhando o contexto das cartas individuais
 
+    // Compartilhando o contexto das cartas individuais
     const { selectedCard, setSelectedCard } = useContext(CardContext);
 
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false, card_id: null, card_name: null });
@@ -70,12 +73,6 @@ export const CardList = () => {
         return array_pokemons
     }
 
-    // async function getAbilityDescription() {
-    //     const response = await fetch("https://pokeapi.co/api/v2/ability/67/")
-    //     const data = await response.json()
-    //     console.log(data)
-    // }
-
     async function loadMoreCards() {
 
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10&offset=${cards.contador_cards}`)
@@ -105,10 +102,9 @@ export const CardList = () => {
             activeStatus: true,
             sprite: card.sprites.front_default
         }
-        console.log(selectedCard)
+        //console.log(selectedCard)
         setSelectedCard(selectedCard)
     }
-
 
     const handleOnMouseMove = (e, card_id, card_name) => {
         const { clientX, clientY } = e;
@@ -116,7 +112,6 @@ export const CardList = () => {
         //console.log('Name: ', card_name)
     }
     // Filtro de tipo de pokemon aqui na exibição
-
     const handleOnMouseLeave = () => {
         setTooltipPosition((prevState) => ({ ...prevState, activeStatus: false, card_id: null, card_name: null }));
         //console.log('Mouse saiu da LI')
@@ -127,9 +122,10 @@ export const CardList = () => {
             <Container className="container">
                 <Header>
                     <img className="pokemon-logo" src="/images/pokemon-logo.png" alt="Logo" />
+                    <ThemeButton />
                 </Header>
                 <Div>
-                    <div className="board-cards">
+                    <BoardCards className="board-cards">
                         <ul>
                             {cards.pokemon_details.map((card) => {
                                 return (
@@ -140,7 +136,6 @@ export const CardList = () => {
                                             {tooltipPosition.activeStatus && (
                                                 <Tooltip className={`${tooltipPosition.activeStatus ? 'active' : ''}`} style={{ top: tooltipPosition.top, left: tooltipPosition.left }}>
                                                     {tooltipPosition.card_name}
-                                                    <br />Click for Details
                                                 </Tooltip>
                                             )}
                                         </li></>
@@ -152,15 +147,18 @@ export const CardList = () => {
                             //console.log("Contador para mudar o offset da requisição GET" + cards.contador_cards)
                             console.log(cards.pokemon_details)
                         }}>Clique para carregar mais 10 Pokemon's</button>
-                    </div>
-                    <div className={`exibition-card ${selectedCard.activeStatus ? 'active' : ''}`}>
+                    </BoardCards>
+                    <ExibitionCard className={selectedCard.activeStatus ? 'active' : ''}>
+                        <img className="pokedex" src="/images/pngegg.png" alt="" />
                         <img className="img-zoom" src={selectedCard.sprite} alt={selectedCard.name} />
-                        <p>{selectedCard.name}</p>
-                        <button>
-                            <Link to={`/card/1`}> Clique para atualizar</Link>
-                        </button>
-                    </div>
-
+                        <p className="pokemon-name">{selectedCard.name}</p>
+                        <div className="dialog-box">
+                            <img src="/images/dialog-box.png" alt="Dialog box" />
+                            <Link to={`/card/${selectedCard.id}`}>
+                                <p className="box-link">Click for Details...</p>
+                            </Link>
+                        </div>
+                    </ExibitionCard>
                 </Div>
             </Container>
         </>
@@ -175,6 +173,7 @@ const Container = styled.div`
     display:flex;
     flex-direction:column;
     min-height: 100vh;
+    font-family: 'Pixelify Sans',sans-serif;
 `
 const Header = styled.header`
     display:flex;
@@ -191,23 +190,116 @@ const Div = styled.div`
 
     display:grid;
     grid-template-columns: repeat(2,45%);
-    //flex-direction:column;
     background-color:lightblue;
     justify-content:center;
     align-items:center;
-    gap:10px;
+    //gap:10px;
     flex-grow:1;
 
-    .board-cards {
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
+    @media (max-width:575px){
+        grid-template-columns: 1fr;
     }
+
+`
+const ExibitionCard = styled.div`
+     // Exibição da card
+    opacity: 0;
+    z-index:2;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    
+    .pokedex {
+        position:absolute;
+        width:550px;
+        height:auto;
+        z-index:1;
+    }
+
+    .img-zoom {    
+        width:auto;
+        height:auto;
+    }
+
+    p   {
+            text-transform:capitalize;
+            font-size:18px;
+            margin:0;
+            
+    }
+
+    .img-zoom,.pokemon-name {
+        z-index:2;
+        transform:translate(-20px,161px);
+    }
+
+    .pokemon-name {
+        background-color:white;
+        border: 2px solid black;
+    }
+
+    &.active {
+        opacity: 1;
+    }
+
+    @media (max-width:575px){
+        //card - 425px;
+        &.active{
+            opacity:0;
+        };
+    }
+
+    
+
+    .dialog-box{
+        display:flex;
+        padding: 20px;
+        position:relative;
+        transform: translate(90px,-190px);
+        font-size:32px;
+        z-index:2;
+        justify-content:center;
+        align-items:center;
+
+        img {
+                width:140px;
+                height:250px;
+                z-index: 0;
+            }
+        .box-link {
+                display:flex;
+                align-items:center;
+                text-align:center;
+                width:110px;
+                height:110px;
+                z-index:0;
+                position:absolute;
+                transform: translate(-125px,-70px);
+            }
+        a {
+            text-decoration:none;
+            color:inherit;
+            transform: translate(00px,0px);
+            z-index:3;
+        }
+
+        
+    }
+
+    
+`
+const BoardCards = styled.div`
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    z-index: 3;
 
     ul {
         list-style-type:none;
         display:grid;
-        grid-template-columns: repeat(5,110px);
+        grid-template-columns:repeat(5,1fr);
         justify-content:center;
         margin: 0;
         padding: 15px;
@@ -227,19 +319,19 @@ const Div = styled.div`
         max-width: 120px;
         height:160px;
         max-height: 160px;
-        background-color: white;
+        background-color: white; // Cor do cartão
         font-size: 18px;
         border: 1px solid black;
         text-align:center;
         //margin: 10px;
         padding:3px;
         border-radius: 4px;
+        text-transform: capitalize;
 
     }
     
-
     .item img{
-        background-color:lightblue;
+        background-color:lightblue; // Fundo da imagem de cada card
         padding: 1px;
         width: auto;
         height: auto;
@@ -248,29 +340,36 @@ const Div = styled.div`
     .item li p {
         background-color:lightblue;
     }
-
-    .exibition-card {
-         // Exibição da card
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        align-items:center;
-        background-color:white;
-        opacity: 0;
+    
+    @media (max-width:1280px){
+        ul {
+            grid-template-columns:repeat(4,1fr);
+        }
         
     }
-    .exibition-card .img-zoom {
-        width:180px;
-        height:180px;
-    }
 
-    .exibition-card.active {
-        opacity: 1;
+     @media (max-width:1000px){
+        ul {
+            grid-template-columns:repeat(3,1fr);
+        }
+    
     }
     
-   
+    @media (max-width:768px){
+        ul {
+            grid-template-columns:repeat(2,1fr);
+        }
+    }
 
-    
+    @media (max-width:575px){
+        //card - 425px;
+        ul {
+            grid-template-columns: 1fr;
+            margin: 0 auto;
+        }
+    }
+
+
 
 `
 const Tooltip = styled.div`
@@ -283,7 +382,7 @@ const Tooltip = styled.div`
     border-radius:5px;
     white-space:no-wrap;
     pointer-events:none;
-    transform: translate(30%,-100%);
+    transform: translate(20%,-100%);
     // transition: opacity 1s ease, transform 1s ease;
     // opacity: 0;
 
@@ -296,8 +395,8 @@ const Tooltip = styled.div`
         content: '';
         color:black;
         position: absolute;
-        left:20px;
-        bottom: 30px; /* Ajuste para colocar a seta na parte inferior */
+        left:16px;
+        bottom: 5px; /* Ajuste para colocar a seta na parte inferior */
         transform: translate(-100%);
         rotate: 0deg;
         border-width: 10px;
@@ -318,6 +417,3 @@ const Tooltip = styled.div`
         }
     }
 `
-
-
-// TAREFAS - Alterar a <ul> para responder a responsividade sem sumir as cartas; achar as fontes para titles;
