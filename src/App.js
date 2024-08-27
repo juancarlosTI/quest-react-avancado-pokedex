@@ -1,18 +1,22 @@
 import './App.css';
 import styled, { keyframes } from 'styled-components';
 import { AppRoutes } from './pages/routes';
-import { ThemesProvider, ThemeContext } from './context/ToggleBtnContext'
+import { ThemeProvider, ThemeContext } from './context/ToggleBtnContext'
 import { useContext } from 'react';
+import { MouseProvider } from './context/MouseMoveContext';
 
 function App() {
   const { theme } = useContext(ThemeContext);
   return (
-    
+
     <>
       <div>
-        <ThemesProvider theme={theme}>
-          <AppRoutes />
-        </ThemesProvider>
+        <MouseProvider>
+          <ThemeProvider theme={theme}>
+            <AppRoutes />
+          </ThemeProvider>
+        </MouseProvider>
+
       </div>
     </>
   );

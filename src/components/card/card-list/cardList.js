@@ -3,11 +3,10 @@ import styled, { keyframes } from "styled-components"
 import { CardContext } from "../../../context/CardContext"
 import { Link } from "react-router-dom"
 import { ThemeButton } from "../../buttonChangeTheme/btnChangeTheme"
-import { ThemeContext, ThemesProvider } from "../../../context/ToggleBtnContext"
+import { ThemeContext } from "../../../context/ToggleBtnContext"
+
 
 export const CardList = () => {
-
-    const { theme } = useContext(ThemeContext);
 
     const [cards, setCards] = useState({
         // Atributos do objeto 
@@ -17,7 +16,6 @@ export const CardList = () => {
         contador_cards: 0
         //Listando 10 pokemons: https://pokeapi.co/api/v2/pokemon?limit=10&offset=0 - A cada atualização da lista, incrementar o offset em 10 significa que, a partir do primeiro, cada vez que a página for atualizada, será pulado 10 pokemon's. Isso faz com que o GET não retorne pokemon's repetidos.
     })
-
 
     // Compartilhando o contexto das cartas individuais
     const { selectedCard, setSelectedCard } = useContext(CardContext);
@@ -108,12 +106,17 @@ export const CardList = () => {
 
     const handleOnMouseMove = (e, card_id, card_name) => {
         const { clientX, clientY } = e;
-        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true, card_id: card_id, card_name: card_name })
+        setTooltipPosition({
+             top: clientY, 
+             left: clientX, 
+             activeStatus: true, 
+             card_id: card_id, 
+             card_name: card_name })
         //console.log('Name: ', card_name)
     }
     // Filtro de tipo de pokemon aqui na exibição
     const handleOnMouseLeave = () => {
-        setTooltipPosition((prevState) => ({ ...prevState, activeStatus: false, card_id: null, card_name: null }));
+        setTooltipPosition(({activeStatus: false}));
         //console.log('Mouse saiu da LI')
     }
 
@@ -174,6 +177,8 @@ const Container = styled.div`
     flex-direction:column;
     min-height: 100vh;
     font-family: 'Pixelify Sans',sans-serif;
+    background-color: ${props => props.theme.background || 'lightgreen'};
+    background-size:cover;
 `
 const Header = styled.header`
     display:flex;
@@ -190,7 +195,6 @@ const Div = styled.div`
 
     display:grid;
     grid-template-columns: repeat(2,45%);
-    background-color:lightblue;
     justify-content:center;
     align-items:center;
     //gap:10px;

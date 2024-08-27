@@ -14,6 +14,9 @@ export const SingleCard = () => {
     const { selectedCard } = useContext(CardContext);
     const [abilities, setAbility] = useState([]);
 
+    //Personalização da descrição das habilidades
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false, description:null });
+
     //Id para nomear o end-point /card/id
     const { id } = useParams;
 
@@ -32,7 +35,16 @@ export const SingleCard = () => {
     }, [selectedCard])
 
 
-
+    const handleOnMouseMove = (e,description) => {
+        const { clientX, clientY } = e;
+        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true,description: description})
+        //console.log('Name: ', card_name)
+    }
+    // Filtro de tipo de pokemon aqui na exibição
+    const handleOnMouseLeave = () => {
+        setTooltipPosition((prevState) => ({ ...prevState, activeStatus: false, description:null }));
+        //console.log('Mouse saiu da LI')
+    }
 
 
     // async function getAbility(){
@@ -48,9 +60,9 @@ export const SingleCard = () => {
 
     return (
         <>
-            <Link to='/'>Voltar para lista de pokémon's</Link>
+            
             <Container>
-
+                <Link to='/'>Voltar para lista de pokémon's</Link>
                 <Div>
                     
                     <div className="pokemon-image">
@@ -79,7 +91,10 @@ export const SingleCard = () => {
                                     return (
                                         <>
 
-                                            <li>{index} - {ability.name} <br/> {ability.description.effect} / </li>
+                                            <li onMouseMove={(e)=>{
+                                                handleOnMouseMove(e,ability.description.effect)}} onMouseLeave={handleOnMouseLeave}>
+                                                {index} - {ability.name} <br/><br/> {ability.description.effect}  
+                                            </li>
 
                                         </>
                                     )
@@ -94,29 +109,37 @@ export const SingleCard = () => {
     )
 }
 const Container = styled.div`
-    width:50vw;
+    display:flex;
     height:100vh;
-    //justify-content:center;
-    margin: 0 auto;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    background: url('images/green-field.jpg');
+    background-size:cover;
+    //margin: 0 auto;
+    font-family: 'Pixelify Sans',sans-serif;
 `
 const Div = styled.div`
     display:flex;
-    //flex-direction:column;
-    //grid-template-colums: repeat(2,1fr);
     justify-content:center;
-    width: 720px;
+    width: 1080px;
     align-items:center;
+    background:white;
+    gap:100px;
     
+
     .pokemon-image {
         display:flex;
         flex-direction:column;
         justify-content:center;
         align-items: center;
+        background:white;
     }
 
     .pokemon-image img {
         width: 250px;
         height: 250px;
+        
     }
 
     p {
@@ -132,6 +155,7 @@ const Details = styled.div`
     gap:10px;
     padding: 5px;
     border-radius:6px;
+    background:white;
 `
 const Moves = styled.div`
     display:flex;
@@ -152,15 +176,18 @@ const Moves = styled.div`
     }
 
     li {
-        border: 1px solid black;
+        text-align:center;
+        align-self:center;
+        border: 2px solid black;
         border-radius: 6px;
         padding: 3px;
     }
 
     p {
-        color: white;
+
+        color: black;
         align-self:center;
-        background-color:black;
+        //background-color:black;
     }
 `
 const Abilities = styled.div`
@@ -170,9 +197,9 @@ const Abilities = styled.div`
     height:200px;
     overflow-y:auto;
     p {
-        color:white;
+        color:black;
         align-self:center;
-        background-color:black;    
+        //background-color:black;    
     }
 
     ul {
