@@ -3,7 +3,6 @@ import { ThemeContext, themes } from '../../context/ToggleBtnContext'
 
 
 
-
 export const ThemeButton = () => {
     const { theme, setTheme } = useContext(ThemeContext);
 
@@ -14,3 +13,4 @@ export const ThemeButton = () => {
         }}>Value</button>
     )
 }
+

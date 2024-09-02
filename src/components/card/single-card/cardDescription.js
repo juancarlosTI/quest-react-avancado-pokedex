@@ -15,7 +15,7 @@ export const SingleCard = () => {
     const [abilities, setAbility] = useState([]);
 
     //Personalização da descrição das habilidades
-    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false, description:null });
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false});
 
     //Id para nomear o end-point /card/id
     const { id } = useParams;
@@ -27,7 +27,7 @@ export const SingleCard = () => {
                 const data = await response.json()
                 const array_ability = await data.effect_entries.find(language => language.language.name === 'en');
                 //Formatando o objeto para incluir o ability.ability.name - Nome da habilidade
-                return {name: ability.ability.name , description: array_ability};
+                return { name: ability.ability.name, description: array_ability };
             }))
             setAbility(abilitiesData);
         }
@@ -35,36 +35,24 @@ export const SingleCard = () => {
     }, [selectedCard])
 
 
-    const handleOnMouseMove = (e,description) => {
+    const handleOnMouseMove = (e, index) => {
         const { clientX, clientY } = e;
-        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true,description: description})
+        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true })
         //console.log('Name: ', card_name)
     }
     // Filtro de tipo de pokemon aqui na exibição
     const handleOnMouseLeave = () => {
-        setTooltipPosition((prevState) => ({ ...prevState, activeStatus: false, description:null }));
+        setTooltipPosition({  activeStatus: false });
         //console.log('Mouse saiu da LI')
     }
 
-
-    // async function getAbility(){
-    //     const response = await getAbilities();
-    //     const data = await fetch('https://pokeapi.co/api/v2/ability/66/');
-    //     const descriptionAbility = await data.json()
-    //     console.log(response.effect_entries[0].effect)
-    //     return await descriptionAbility
-    // }
-
-    //getAbility();
-    //console.log(abilities)
-
     return (
         <>
-            
+
             <Container>
-                <Link to='/'>Voltar para lista de pokémon's</Link>
+                <Link className="btn-back" to='/'>Voltar para lista de pokémon's</Link>
                 <Div>
-                    
+
                     <div className="pokemon-image">
                         <img src={selectedCard.sprite} alt={selectedCard.name} />
                         <p>{selectedCard.name}</p>
@@ -91,9 +79,15 @@ export const SingleCard = () => {
                                     return (
                                         <>
 
-                                            <li onMouseMove={(e)=>{
-                                                handleOnMouseMove(e,ability.description.effect)}} onMouseLeave={handleOnMouseLeave}>
-                                                {index} - {ability.name} <br/><br/> {ability.description.effect}  
+                                            <li onMouseMove={(e) => {
+                                                handleOnMouseMove(e,index)
+                                            }} onMouseLeave={handleOnMouseLeave}>
+                                                {ability.name}
+                                                {selectedCard.activeStatus && (
+                                                    <Tooltip className={`${tooltipPosition.activeStatus ? 'active' : ''}`} style={{ top: tooltipPosition.top, left: tooltipPosition.left }}>
+                                                        {ability.description.effect}
+                                                    </Tooltip>
+                                                )}
                                             </li>
 
                                         </>
@@ -114,46 +108,64 @@ const Container = styled.div`
     justify-content:center;
     align-items:center;
     flex-direction:column;
-    background: url('images/green-field.jpg');
-    background-size:cover;
+    background: ${props => props.theme.backgroundImageDescription};
+    background-size:110% 120vh;
+    background-repeat: no-repeat;
     //margin: 0 auto;
     font-family: 'Pixelify Sans',sans-serif;
+
+    .btn-back {
+        background-color:white;
+        padding:10px;
+        margin-bottom:20px;
+        border-radius:6px;
+        border: 5px double black;
+    }
 `
 const Div = styled.div`
     display:flex;
     justify-content:center;
     width: 1080px;
+    height:350px;
+    padding:5px;
     align-items:center;
-    background:white;
+    background-color:lightblue;
     gap:100px;
+    border: 20px solid black;
+    outline:5px solid black;
+    outline-offset: -40px;
+    
     
 
+    //border-radius:5px;
+    //border-width:thick;
+    
     .pokemon-image {
         display:flex;
         flex-direction:column;
         justify-content:center;
         align-items: center;
         background:white;
+        border: 1px solid black;
+        border-radius:5px;
+        border-width:medium;
     }
 
     .pokemon-image img {
         width: 250px;
         height: 250px;
-        
     }
 
     p {
         align-self: center;
-        //Então é assim que usa isso ;D
     }
-
 `
 const Details = styled.div`
     display:grid;
     grid-template-columns: repeat(2,1fr);
-    border: 1px solid black;
+    border: 5px inset black;
     gap:10px;
-    padding: 5px;
+    padding: 25px;
     border-radius:6px;
     background:white;
 `
@@ -165,6 +177,7 @@ const Moves = styled.div`
     height:200px;
     overflow-y:auto;
     padding: 3px;
+    margin: 0 auto;
     //justify-content:center;
 
     ul {
@@ -172,31 +185,43 @@ const Moves = styled.div`
         grid-template-columns: repeat(2,1fr);
         list-style-type: none;
         padding: 0;
+        margin: 0;
         gap: 10px;
     }
 
     li {
+        width: 70px;
         text-align:center;
         align-self:center;
         border: 2px solid black;
         border-radius: 6px;
-        padding: 3px;
+        padding: 5px;
+        font-weight:600;
+        word-break:break-word;
     }
 
     p {
 
         color: black;
         align-self:center;
+        
         //background-color:black;
+    }
+
+    li::first-letter {
+        text-transform: uppercase;
     }
 `
 const Abilities = styled.div`
+
     display:flex;
     flex-direction:column;
     width:250px;
     height:200px;
-    overflow-y:auto;
+    overflow-y:scroll;
+
     p {
+        display:flex;
         color:black;
         align-self:center;
         //background-color:black;    
@@ -207,12 +232,41 @@ const Abilities = styled.div`
         flex-direction:column;
         list-style-type:none;
         padding: 0;
+        margin: 0;
         gap: 10px;
     }
 
     li {
-        border: 1px solid black;
+        display:flex;
+        font-weight:600;
+        border: 2px solid black;
         border-radius: 6px;
         padding: 3px;
+        justify-content:center;
+        align-items:center;
+        padding:10px;
+        text-transform:capitalize;
     }
+
+`
+const Tooltip = styled.div`
+    opacity: 0;
+    display:none;
+    //justify-content:center;
+    pointer-events:none;
+    text-transform:none;
+    width:250px;
+    padding:10px;
+    word-wrap:break-word;
+    //transform: translate(0,-110%);
+    background-color:white;
+    
+
+
+    &.active {
+        display:block;
+        opacity:1;
+        align-self:center;
+    }
+
 `

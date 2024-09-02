@@ -12,6 +12,7 @@ export const CardList = () => {
         // Atributos do objeto 
         loaded_pokemons: [],
         pokemon_details: [],
+        pokemon_types:[],
         // Contador para atualizar offset do loadMoreCards
         contador_cards: 0
         //Listando 10 pokemons: https://pokeapi.co/api/v2/pokemon?limit=10&offset=0 - A cada atualização da lista, incrementar o offset em 10 significa que, a partir do primeiro, cada vez que a página for atualizada, será pulado 10 pokemon's. Isso faz com que o GET não retorne pokemon's repetidos.
@@ -50,9 +51,16 @@ export const CardList = () => {
                 //console.log(data)
                 return await data;
             }))
+            
+            const filterTypes = objectData.flatMap(card => card.types.map(type => type.type.name))
+
+            //Removendo duplicatas do array
+            const uniqueTypes = [...new Set(filterTypes)]
+
             setCards(cards => ({
                 ...cards,
-                pokemon_details: [...objectData]
+                pokemon_details: [...objectData],
+                pokemon_types: [...uniqueTypes]
             }))
         }
         getObjectCard();
@@ -70,9 +78,7 @@ export const CardList = () => {
         }));
         return array_pokemons
     }
-
     async function loadMoreCards() {
-
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10&offset=${cards.contador_cards}`)
         const data = await response.json()
         console.log("cont: " + cards.contador_cards)
@@ -80,7 +86,7 @@ export const CardList = () => {
             name: card.name,
             description_url: card.url
         }));
-        console.log(array_pokemons);
+        //console.log(array_pokemons);
         return setCards(cards => ({
             ...cards,
             contador_cards: cards.contador_cards + 10,
@@ -88,7 +94,9 @@ export const CardList = () => {
         }))
 
     }
-
+    const handleTypes = () => {
+        console.log(cards.pokemon_types)
+    }
     const handleRenderCardClick = (card) => {
         // Lista de movimentos (moves) data.moves[i].move.name e move.url
         // Lista de habilidades (abilities) - Nome e descrição - Acessar a url da habilidade e pegar o atributo - effect_entries : effect. Como os pokemon's possuem mais de uma habilidade, é necessário que este atributo receba um array [habilidade,descricao_da_habilidade]. data.abilities[i].ability.name e .ability.url
@@ -103,7 +111,6 @@ export const CardList = () => {
         //console.log(selectedCard)
         setSelectedCard(selectedCard)
     }
-
     const handleOnMouseMove = (e, card_id, card_name) => {
         const { clientX, clientY } = e;
         setTooltipPosition({
@@ -111,7 +118,7 @@ export const CardList = () => {
              left: clientX, 
              activeStatus: true, 
              card_id: card_id, 
-             card_name: card_name })
+             card_name: card_name })    
         //console.log('Name: ', card_name)
     }
     // Filtro de tipo de pokemon aqui na exibição
@@ -125,11 +132,11 @@ export const CardList = () => {
             <Container className="container">
                 <Header>
                     <img className="pokemon-logo" src="/images/pokemon-logo.png" alt="Logo" />
-                    <ThemeButton />
+                    <ThemeButton/>
                 </Header>
                 <Div>
                     <BoardCards className="board-cards">
-                        <ul>
+                        <ul className="listed-cards">
                             {cards.pokemon_details.map((card) => {
                                 return (
                                     <>
@@ -145,11 +152,17 @@ export const CardList = () => {
                                 )
                             })}
                         </ul>
-                        <button onClick={() => {
+                        <button className="load-more-cards" onClick={() => {
                             loadMoreCards();
                             //console.log("Contador para mudar o offset da requisição GET" + cards.contador_cards)
-                            console.log(cards.pokemon_details)
+                            //console.log(cards.pokemon_details)  
                         }}>Clique para carregar mais 10 Pokemon's</button>
+                        <ul className="filter-cards">
+                            <button onClick={handleTypes}>
+                                Clique
+                            </button>
+                            {/* {cards.pokemon_types.map((type,index) => <li key={index}>{type}</li>)} */}
+                        </ul>
                     </BoardCards>
                     <ExibitionCard className={selectedCard.activeStatus ? 'active' : ''}>
                         <img className="pokedex" src="/images/pngegg.png" alt="" />
@@ -178,15 +191,21 @@ const Container = styled.div`
     min-height: 100vh;
     font-family: 'Pixelify Sans',sans-serif;
     background-color: ${props => props.theme.background || 'lightgreen'};
-    background-size:cover;
+    background-image: ${props => props.theme.backgroundImageMain};
+    background-size:100% 100vh;
 `
 const Header = styled.header`
     display:flex;
-    justify-content:center;
     max-width:100vw;
+
 
     .pokemon-logo {
         width:240px;
+        margin: 0 auto;
+    }
+
+    .filter-cards {
+        display:flex;
     }
 
 `
@@ -203,6 +222,109 @@ const Div = styled.div`
     @media (max-width:575px){
         grid-template-columns: 1fr;
     }
+
+`
+const BoardCards = styled.div`
+    display:grid;
+    grid-template-areas: "listed-cards filter-cards"
+                         "button button";
+    //flex-direction:column;
+    //justify-content:center;
+    z-index: 3;
+
+    .listed-cards {
+        list-style-type:none;
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        grid-area: listed-cards;
+        justify-content:center;
+        margin: 0;
+        padding: 15px;
+        border:1px solid black;
+        background-color:${props => props.theme.background};
+        flex-wrap:wrap;
+        max-width:470px;
+        height: 340px;
+        overflow-y:scroll;
+        scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
+        scrollbar-color: #cfcfcf #ffffff; /* Define as cores do thumb e do trilho */
+        gap:10px;
+    }
+    
+    .item {
+        //position:relative;
+        display:flex;
+        flex-direction:column;
+        max-width: 120px;
+        height:160px;
+        max-height: 160px;
+        background-color: white; // Cor do cartão
+        font-size: 18px;
+        border: 1px solid black;
+        text-align:center;
+        //margin: 10px;
+        padding:3px;
+        border-radius: 4px;
+        
+    }
+
+    .item:hover {
+        //background-color:lightblue;
+        border: 2px ridge white;
+        box-shadow:0px 0px 3px white;
+    }
+
+    
+    .item img{
+        background-color:lightblue; // Fundo da imagem de cada card
+        padding: 1px;
+        width: auto;
+        height: auto;
+    }
+
+    .item li p {
+        background-color:lightblue;
+    }
+
+    .load-more-cards {
+        width:502px;
+        grid-area: button;
+    }
+
+    .filter-cards {
+        background-color:white;
+
+    }
+    
+    @media (max-width:1280px){
+        .listed-cards {
+            grid-template-columns:repeat(4,1fr);
+        }
+        
+    }
+
+     @media (max-width:1000px){
+        .listed-cards {
+            grid-template-columns:repeat(3,1fr);
+        }
+    
+    }
+    
+    @media (max-width:768px){
+        .listed-cards {
+            grid-template-columns:repeat(2,1fr);
+        }
+    }
+
+    @media (max-width:575px){
+        //card - 425px;
+        .listed-cards {
+            grid-template-columns: 1fr;
+            margin: 0 auto;
+        }
+    }
+
+
 
 `
 const ExibitionCard = styled.div`
@@ -294,88 +416,6 @@ const ExibitionCard = styled.div`
 
     
 `
-const BoardCards = styled.div`
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    z-index: 3;
-
-    ul {
-        list-style-type:none;
-        display:grid;
-        grid-template-columns:repeat(5,1fr);
-        justify-content:center;
-        margin: 0;
-        padding: 15px;
-        border:1px solid black;
-        flex-wrap:wrap;
-        height: 400px;
-        overflow-y:scroll;
-        scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
-        scrollbar-color: #888 #ffffff; /* Define as cores do thumb e do trilho */
-        gap:10px;
-    }
-    
-    .item {
-        //position:relative;
-        display:flex;
-        flex-direction:column;
-        max-width: 120px;
-        height:160px;
-        max-height: 160px;
-        background-color: white; // Cor do cartão
-        font-size: 18px;
-        border: 1px solid black;
-        text-align:center;
-        //margin: 10px;
-        padding:3px;
-        border-radius: 4px;
-        text-transform: capitalize;
-
-    }
-    
-    .item img{
-        background-color:lightblue; // Fundo da imagem de cada card
-        padding: 1px;
-        width: auto;
-        height: auto;
-    }
-
-    .item li p {
-        background-color:lightblue;
-    }
-    
-    @media (max-width:1280px){
-        ul {
-            grid-template-columns:repeat(4,1fr);
-        }
-        
-    }
-
-     @media (max-width:1000px){
-        ul {
-            grid-template-columns:repeat(3,1fr);
-        }
-    
-    }
-    
-    @media (max-width:768px){
-        ul {
-            grid-template-columns:repeat(2,1fr);
-        }
-    }
-
-    @media (max-width:575px){
-        //card - 425px;
-        ul {
-            grid-template-columns: 1fr;
-            margin: 0 auto;
-        }
-    }
-
-
-
-`
 const Tooltip = styled.div`
     width:130px;
     position:fixed;
@@ -410,7 +450,9 @@ const Tooltip = styled.div`
         animation: moveUpDown 1.5s ease-in-out infinite
     }
 
-    
+    &::first-letter {
+        text-transform: uppercase;
+    }
     
     @keyframes moveUpDown {
         0%, 100% {

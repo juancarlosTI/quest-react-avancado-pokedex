@@ -12,12 +12,12 @@ function App() {
     <>
       <div>
         <MouseProvider>
-          <ThemeProvider theme={theme}>
+          <ThemeProvider>
             <AppRoutes />
           </ThemeProvider>
         </MouseProvider>
 
-      </div>
+      </div>  
     </>
   );
 }
