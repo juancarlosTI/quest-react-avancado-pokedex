@@ -15,10 +15,7 @@ export const SingleCard = () => {
     const [abilities, setAbility] = useState([]);
 
     //Personalização da descrição das habilidades
-    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false});
-
-    //Id para nomear o end-point /card/id
-    const { id } = useParams;
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0, activeStatus: false, activeIndex: null });
 
     useEffect(() => {
         async function getAbilities() {
@@ -37,12 +34,12 @@ export const SingleCard = () => {
 
     const handleOnMouseMove = (e, index) => {
         const { clientX, clientY } = e;
-        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true })
+        setTooltipPosition({ top: clientY, left: clientX, activeStatus: true, activeIndex: index })
         //console.log('Name: ', card_name)
     }
     // Filtro de tipo de pokemon aqui na exibição
     const handleOnMouseLeave = () => {
-        setTooltipPosition({  activeStatus: false });
+        setTooltipPosition({ activeStatus: false, activeIndex: null });
         //console.log('Mouse saiu da LI')
     }
 
@@ -55,43 +52,34 @@ export const SingleCard = () => {
 
                     <div className="pokemon-image">
                         <img src={selectedCard.sprite} alt={selectedCard.name} />
-                        <p>{selectedCard.name}</p>
+                        <p className="pokemon-name">
+                            Name: <br/>
+                            {selectedCard.name}
+                        </p>
                     </div>
 
                     <Details>
                         <Moves>
-                            <p>Moves</p>
+                            <p className="listed-moves">Moves</p>
                             <ul>
-                                {selectedCard.moves.map((move) => {
-                                    return (
-                                        <>
-                                            <li>{move.move.name}</li>
-                                        </>
-                                    )
+                                {selectedCard.moves.map((move, index) => {
+                                    return <li key={index}>{move.move.name}</li>
                                 })}
                             </ul>
                         </Moves>
                         <Abilities>
-                            <p>Abilities</p>
+                            <p className="listed-abilities">Abilities</p>
                             <ul>
                                 {abilities.map((ability, index) => {
+                                    return <li key={index} onMouseMove={(e) => {
+                                        handleOnMouseMove(e, index)
+                                    }} onMouseLeave={handleOnMouseLeave}>
+                                        <p className="ability-name">{ability.name}</p>
+                                        <Tooltip className={`${tooltipPosition.activeIndex === index && tooltipPosition.activeStatus ? 'active' : ''}`} style={{ top: tooltipPosition.top, left: tooltipPosition.left }}>
+                                            <p className="ability-effect">{ability.description.effect}</p>
+                                        </Tooltip>
 
-                                    return (
-                                        <>
-
-                                            <li onMouseMove={(e) => {
-                                                handleOnMouseMove(e,index)
-                                            }} onMouseLeave={handleOnMouseLeave}>
-                                                {ability.name}
-                                                {selectedCard.activeStatus && (
-                                                    <Tooltip className={`${tooltipPosition.activeStatus ? 'active' : ''}`} style={{ top: tooltipPosition.top, left: tooltipPosition.left }}>
-                                                        {ability.description.effect}
-                                                    </Tooltip>
-                                                )}
-                                            </li>
-
-                                        </>
-                                    )
+                                    </li>
                                 })}
                             </ul>
                         </Abilities>
@@ -104,13 +92,13 @@ export const SingleCard = () => {
 }
 const Container = styled.div`
     display:flex;
+    width:100vw;
     height:100vh;
     justify-content:center;
     align-items:center;
     flex-direction:column;
     background: ${props => props.theme.backgroundImageDescription};
-    background-size:110% 120vh;
-    background-repeat: no-repeat;
+    background-size:cover;
     //margin: 0 auto;
     font-family: 'Pixelify Sans',sans-serif;
 
@@ -125,20 +113,18 @@ const Container = styled.div`
 const Div = styled.div`
     display:flex;
     justify-content:center;
-    width: 1080px;
+    width: 1000px;
     height:350px;
-    padding:5px;
+    padding:25px;
     align-items:center;
     background-color:lightblue;
-    gap:100px;
-    border: 20px solid black;
+    gap:10px;
+    
+    border: 10px solid black;
+    border-radius:6px;
+
     outline:5px solid black;
     outline-offset: -40px;
-    
-    
-
-    //border-radius:5px;
-    //border-width:thick;
     
     .pokemon-image {
         display:flex;
@@ -146,8 +132,8 @@ const Div = styled.div`
         justify-content:center;
         align-items: center;
         background:white;
-        border: 1px solid black;
-        border-radius:5px;
+        border: 5px inset black;
+        border-radius:6px;
         border-width:medium;
     }
 
@@ -156,29 +142,89 @@ const Div = styled.div`
         height: 250px;
     }
 
-    p {
+    .pokemon-name{
+        font-size:22px;
         align-self: center;
+        text-transform:capitalize;
+        margin:0;
+    }
+
+
+    @media (max-width:1024px){
+        width: 800px;
+        
+        .pokemon-image img{
+            width:180px;
+            height:180px;
+        }
+    }
+
+    @media (max-width:768px){
+        width:580px;
+    }
+
+    @media (max-width:576px){
+        width:270px;
+        flex-direction:column;
+        padding:10px;
+
+        .pokemon-image {
+            flex-direction: row;
+            padding: 0 10px;
+            
+        }
+
+        .pokemon-image img {
+            width:130px;
+            height:130px;
+        }
+
+        .pokemon-name {
+            font-size:14px;
+            
+        }
     }
 `
 const Details = styled.div`
     display:grid;
+    width:550px;
+    height:250px;
     grid-template-columns: repeat(2,1fr);
     border: 5px inset black;
+    border-width:medium;
+    //height:256px;
     gap:10px;
-    padding: 25px;
+    padding: 15px;
+    margin-top:20px;
     border-radius:6px;
+    align-items:center;
     background:white;
+    
+    @media (max-width:768px){
+        display:flex;
+        flex-direction:column;
+        width:300px;
+        height: 250px;
+    }
+
+    @media (max-width:576px){
+        
+        width:200px;
+        height:90px;
+        flex-direction:row;
+    }
 `
 const Moves = styled.div`
     display:flex;
     flex-direction:column;
-    //flex-wrap: wrap;
     width:250px;
     height:200px;
     overflow-y:auto;
+    scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
+    scrollbar-color: #cfcfcf #ffffff; /* Define as cores do thumb e do trilho */
     padding: 3px;
-    margin: 0 auto;
-    //justify-content:center;
+    align-items:center;
+        
 
     ul {
         display:grid;
@@ -200,16 +246,37 @@ const Moves = styled.div`
         word-break:break-word;
     }
 
-    p {
-
+    .listed-moves {
+        font-size:22px;
         color: black;
         align-self:center;
-        
-        //background-color:black;
     }
 
     li::first-letter {
         text-transform: uppercase;
+    }
+
+    li:hover {
+        background-color:lightblue;
+        color:white;
+        box-shadow:0px 0px 3px blue;
+        border: 2px solid white;
+
+    }
+
+    @media (max-width:576px){
+
+        li { 
+            width:35px;
+            font-size:10px;
+            padding:2px;
+        }
+
+        height: 100%;
+
+        .listed-moves {
+            font-size:14px;
+        }
     }
 `
 const Abilities = styled.div`
@@ -217,14 +284,17 @@ const Abilities = styled.div`
     display:flex;
     flex-direction:column;
     width:250px;
-    height:200px;
+    height:200px;   
     overflow-y:scroll;
-
-    p {
+    padding:3px;
+    scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
+    scrollbar-color: #cfcfcf #ffffff; /* Define as cores do thumb e do trilho */
+    
+    .listed-abilities {
         display:flex;
+        font-size:22px;
         color:black;
-        align-self:center;
-        //background-color:black;    
+        align-self:center;   
     }
 
     ul {
@@ -242,14 +312,51 @@ const Abilities = styled.div`
         border: 2px solid black;
         border-radius: 6px;
         padding: 3px;
+        margin-bottom: 2px;
         justify-content:center;
         align-items:center;
-        padding:10px;
         text-transform:capitalize;
+    }
+
+    li:hover {
+        box-shadow:0px 0px 3px blue;
+        border: 2px solid white;
+
+    }
+
+    .ability-name {
+        margin: 0;
+    }
+
+    @media (max-width:1024px){
+        width:220px;
+        height:170px;
+    
+    }
+
+    @media (max-width:575px){
+        width:150px;
+        height:100%;
+
+        .listed-abilities {
+            font-size:14px;
+        }
+        
+        .ability-name {
+            font-size:10px;
+            text-align:center;
+        }
+
+        li {
+            flex-direction:column;
+            padding:5px;
+        }
+
     }
 
 `
 const Tooltip = styled.div`
+
     opacity: 0;
     display:none;
     //justify-content:center;
@@ -259,14 +366,22 @@ const Tooltip = styled.div`
     padding:10px;
     word-wrap:break-word;
     //transform: translate(0,-110%);
-    background-color:white;
+    background-color:white;   
     
-
-
     &.active {
         display:block;
         opacity:1;
         align-self:center;
     }
 
+    @media (max-width:575px){
+
+        width:100%;
+        padding:0;
+        .ability-effect{
+            font-size:10px;
+        }
+    }
+
+    
 `

@@ -7,7 +7,8 @@ export const themes = {
         color: '#000000',
         background: 'lightblue',
         backgroundImageMain: "url('/images/background-dia.jpg')",
-        backgroundImageDescription:"url('/images/green-field.jpg')"
+        backgroundImageDescription:"url('/images/green-field.jpg')",
+        borderColor:""
     },
     dark: {
         color: '#ffffff',
