@@ -18,6 +18,7 @@ export const ThemeButton = () => {
 const Button = styled.button`
     position:absolute;
     display:flex;
+    justify-content:center;
     align-self:center;
     right:50px;
     background-color:${props => props.theme.background};
@@ -28,5 +29,13 @@ const Button = styled.button`
     font-family: 'Pixelify Sans',sans-serif;
     font-size:12px;
     color: ${props => props.theme.color};
+
+    @media (max-width:575px){
+        width:60px;
+    }
+
+    @media (max-width:320px){
+        right:15px;
+    }
     
 `

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { ThemeButton } from "../../buttonChangeTheme/btnChangeTheme"
 import { ThemeContext } from "../../../context/ToggleBtnContext"
 import { type } from "@testing-library/user-event/dist/type"
-
+import { PokedexScreen } from "./pokedex"
 
 export const CardList = () => {
 
@@ -51,7 +51,7 @@ export const CardList = () => {
     }, [])
 
 
-    // Usando a description_url para acessar o objeto card indiv que fica dentro do retorno da função getCards()
+    // Usando a description_url para acessar o objeto card que fica dentro do retorno da função getCards()
 
     useEffect(() => {
         async function getObjectCard() {
@@ -190,15 +190,15 @@ export const CardList = () => {
     }
 
     return (
-        <Container className="container">
-            <Header>
+        <Container className={`container ${selectedCard.activeStatus ? 'active' : ''}`}>
+            <Header className={`${selectedCard.activeStatus ? 'active' : ''}`}>
                 <img className="pokemon-logo" src="/images/pokemon-logo.png" alt="Logo" />
                 <ThemeButton />
             </Header>
-            <Div>
+            <Div className={selectedCard.activeStatus ? 'active' : ''}>
                 <BoardCards className="board-cards">
-                    <ul className="listed-cards">
-                        <button className="load-more-cards" onClick={() => {
+                    <ul className={`listed-cards ${selectedCard.activeStatus ? 'active' : ''}`}>
+                        <button className={`load-more-cards ${selectedCard.activeStatus ? 'active' : ''}`} onClick={() => {
                             loadMoreCards();
                             //console.log("Contador para mudar o offset da requisição GET" + cards.contador_cards)
                             //console.log(cards.pokemon_details)  
@@ -225,7 +225,7 @@ export const CardList = () => {
                             </li>
                         }))}
                     </ul>
-                    <button className="btn-open-filter" onClick={() => toggleClass(isOpen.isOpen)}>
+                    <button className={`btn-open-filter ${selectedCard.activeStatus ? 'active' : ''}`} onClick={() => toggleClass(isOpen.isOpen)}>
                         Filter<br /> by Type
                         <ul className={`filter-cards ${isOpen.isOpen ? 'show-filter' : ''}`}
                             onClick={(e) => e.stopPropagation()}>
@@ -243,17 +243,13 @@ export const CardList = () => {
                             )}
                         </ul>
                     </button>
+                    <div className={`modal-575 ${selectedCard.activeStatus ? 'active' : ''}`}>
+                        <div className="x-shape" onClick={() => setSelectedCard({})}/>
+                        <PokedexScreen/>
+                    </div>
                 </BoardCards>
                 <ExibitionCard className={selectedCard.activeStatus ? 'active' : ''}>
-                    <img className="pokedex" src="/images/pokedex.png" alt="Pokedéx" />
-                    <img className="img-zoom" src={selectedCard.sprite} alt={selectedCard.name} />
-                    <p className="pokemon-name">{selectedCard.name}</p>
-                    <div className="dialog-box">
-                        <img src="/images/dialog-box.png" alt="Dialog box" />
-                        <Link to={`/card/${selectedCard.id}`}>
-                            <p className="box-link">Click for Details...</p>
-                        </Link>
-                    </div>
+                    <PokedexScreen/>
                 </ExibitionCard>
             </Div>
         </Container>
@@ -277,6 +273,8 @@ const Container = styled.div`
     background-color: ${props => props.theme.background || 'lightgreen'};
     background-image: ${props => props.theme.backgroundImageMain};
     background-size:100% 100vh;
+
+    
 `
 const Header = styled.header`
     display:flex;
@@ -298,14 +296,21 @@ const Header = styled.header`
         }
     }
 
+    @media (max-width:575px){
+        &.active {
+            opacity:0;
+        }
+    }
+
 `
 const Div = styled.div`
     display:flex;
     justify-content:center;
     align-self:center;
     //gap:100px;
-    flex-grow:1;
-    //margin:0 auto;
+    //flex-grow:1;
+    //margin-top:50px;
+    padding-top:20px;
     width:100%;
     height:100%;
     max-height:768px;
@@ -314,6 +319,7 @@ const Div = styled.div`
 
     @media (max-width:575px){
         gap: 0;
+        
     }
 
 `
@@ -340,7 +346,7 @@ const BoardCards = styled.div`
         width:470px;
         max-height: 340px;
         align-items:center;
-        overflow-y:scroll;
+        overflow-y:auto;
         scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
         scrollbar-color: #cfcfcf #ffffff; /* Define as cores do thumb e do trilho */
         //gap:10px;
@@ -387,13 +393,12 @@ const BoardCards = styled.div`
     .load-more-cards {
         display:flex;
         position:fixed;
-        top:0px;
+        top:0;
         transform:translate(50%,0);
-        text-align:center;
+        justify-content:center;
         max-width:50%;
         width:100%;
         grid-area: button;
-        //transform:translate(0,170px);
     }
 
     .btn-open-filter {
@@ -405,7 +410,8 @@ const BoardCards = styled.div`
         border-width:3px;
         border-radius:5px;
         padding:0px;
-        color: ${props => props.theme.color}
+        transform: translate(20px, 0);
+        color: ${props => props.theme.color};
     }
 
     .filter-cards {
@@ -437,13 +443,22 @@ const BoardCards = styled.div`
     }
 
     .filter-cards.show-filter li {
-        margin:0 10px;
+        margin:5px;
         padding:2px;
         border-radius:5px;
         background-color: lightgreen;
         text-align:center;
     }
 
+    .modal-575 {
+        opacity:0;
+        display:none;
+    }
+
+    .modal-575.active {
+        opacity:1;
+        
+    }
     
 
     @media (max-width:1024px){
@@ -477,26 +492,90 @@ const BoardCards = styled.div`
         display:flex;
         flex-direction:column;
         justify-content:center;
-        
+        transform:none;
+
         .listed-cards {
             width:240px;
             display:flex;
             flex-direction:column;
             margin: 0 auto;
+            z-index:3;
+            margin-top:80px;
         }
 
-        transform:none;
+        .filter-cards.show-filter {
+            bottom:100%;
+            left:0;
+            max-height:60px;
+            overflow-y:auto;
+            scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
+            scrollbar-color: #cfcfcf #ffffff; /* Define as cores do thumb e do trilho */
+        }
+
+        .load-more-cards {
+            transform:none;
+            top:120px;
+            width:120px;
+        }
+
+        .btn-open-filter {
+            align-self:flex-start;
+            position:absolute;
+            top:0;
+        }
+
+        .modal-575.active {
+            position:absolute;
+            display:flex;
+            flex-direction:column;
+            width:100%;
+            height:auto;
+            text-align:center;
+            top:0;
+            padding:50px 0;
+            background-color:rgba(0,0,0,0.75);
+            border-radius:5px;
+
+            .x-shape {
+                position:absolute;
+                width:50px;
+                height:50px;
+                cursor:pointer;
+                z-index:3;
+            }
+
+            .x-shape::before, .x-shape::after {
+                content:'';
+                position:absolute;
+                top:0;
+                width:5px;
+                height:100%;
+                background-color:white;
+                //transform-origin:center;
+            }
+
+            .x-shape::before {
+                transform: rotate(45deg); /* Rotaciona uma linha em 45 graus */
+            }
+
+            .x-shape::after {
+              transform: rotate(-45deg); /* Rotaciona a outra linha em -45 graus */
+            }
+        }
+
+        .listed-cards.active, .load-more-cards.active, .btn-open-filter.active {
+            display:none;
+        }
+
+        
     }
-
-
-
 `
 const ExibitionCard = styled.div`
      // Exibição da card
     opacity: 0;
     z-index:2;
     position:relative;
-    display:flex;
+    display:none;
     flex-direction:column;
     justify-content:center;
     align-items:center;
@@ -533,6 +612,7 @@ const ExibitionCard = styled.div`
     }
 
     &.active {
+        display:flex;
         opacity: 1;
     }
 
@@ -548,7 +628,10 @@ const ExibitionCard = styled.div`
     }
 
     @media(max-width:575px){
-        display:none;
+        &.active {
+            display:none;
+        }
+
     }
 
     .dialog-box{
@@ -580,10 +663,10 @@ const ExibitionCard = styled.div`
             transform: translate(-125px,-70px);
             word-break: break-word;
             }
+
         a {
             text-decoration:none;
             color:inherit;
-            transform: translate(00px,0px);
             z-index:3;
         }
 
