@@ -8,9 +8,10 @@ O seguinte projeto utiliza de uma API RESTful (https://pokeapi.co/) para listar 
 a) getCards() - faz uma requisição GET para a API e retorna um array que armazena as cartas simples.    
 b) loadMoreCards()  - faz uma requisição GET para a API , utilizando uma variável para alterar o off-set da requisição e captar as cartas posteriores. ( Não utilizar o off-set resulta em uma requisição GET que retorna as mesmas cartas da lista de cartas da API.)    
 c) handleRenderCardClick() - abre uma seção da página inicial, que renderiza uma pré-visualização da imagem do pokémon, junto a uma pokedéx.
+d) getObjectCard() - faz uma requisição GET, utilizando o link presente no atributo 'description_url' para exibir os detalhes de cada cartas simples e salva no array 'pokemon_details' e lista os 'types' presentes em cada carta.
 
 2. cardDescription.js  
-   a) getAbilities() - 
+   a) getAbilities() - a partir da carta armazenada no contexto 'CardContext', realiza uma requisição GET que retorna um objeto de atributos relacionados a carta selecionada.
 
 # Ferramentas utilizadas
 
