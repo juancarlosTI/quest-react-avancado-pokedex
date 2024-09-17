@@ -15,9 +15,10 @@ d) getObjectCard() - faz uma requisição GET, utilizando o link presente no atr
 
 # Ferramentas utilizadas
 
+JS
 useState - React 
 useContext- React
-styled-components - React - Para modularizar cada peça de código css com seu respectivo componente.
+styled-components - React 
 
 # Decisões adotadas
 
