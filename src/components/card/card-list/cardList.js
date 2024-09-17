@@ -184,7 +184,7 @@ export const CardList = () => {
                     <ul className={`listed-cards ${selectedCard.activeStatus ? 'active' : ''}`}>
                         <button className={`load-more-cards ${selectedCard.activeStatus ? 'active' : ''}`} onClick={() => {
                             loadMoreCards();
-                            console.log(cards.loaded_pokemons)
+                            console.log(cards.pokemon_details)
                             //console.log("Contador para mudar o offset da requisição GET" + cards.contador_cards)
                             //console.log(cards.pokemon_details)  
                         }}>Clique para carregar mais 10 Pokemon's</button>

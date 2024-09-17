@@ -7,7 +7,7 @@ import styled from "styled-components"
 import { CardContext } from "../../../context/CardContext";
 import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
+import React from "react";
 
 
 export const SingleCard = () => {
@@ -50,10 +50,28 @@ export const SingleCard = () => {
 
                     <div className="pokemon-image">
                         <img src={selectedCard.sprite} alt={selectedCard.name} />
-                        <p className="pokemon-name">
-                            Name: <br/>
-                            {selectedCard.name}
-                        </p>
+                        <div className="pokemon-info">
+                            <p className="pokemon-name">
+                                Name: <br />
+                                {selectedCard.name}
+                            </p>
+                            <p className="pokemon-types">
+                                Types: <br />
+                                <ul>
+                                    {selectedCard.types.map((type, index) => (
+
+                                        <React.Fragment key={type.type.name}>
+                                            <li>
+                                                {type.type.name}
+                                                <br />
+                                            </li>
+                                        </React.Fragment>
+
+                                    ))}
+                                </ul>
+                            </p>
+                        </div>
+
                     </div>
 
                     <Details>
@@ -135,8 +153,8 @@ const Div = styled.div`
     }
 
     .pokemon-image img {
-        width: 250px;
-        height: 250px;
+        width: 230px;
+        height: 230px;
     }
 
     .pokemon-name{
@@ -146,6 +164,26 @@ const Div = styled.div`
         margin:0;
     }
 
+    .pokemon-types {
+        display:flex;
+        align-items:center;
+        margin: 0;
+        padding:5px 0px;
+        padding-left:5px;
+        margin-top:10px;
+        font-size:12px;
+        border:1px inset grey;
+    }
+    
+    .pokemon-types ul {
+        list-style-type:none;
+        padding-left:20px;
+        margin:2px;
+    }
+
+    .pokemon-types ul li::first-letter{
+        text-transform: uppercase;
+    }
 
     @media (max-width:1024px){
         width: 800px;
@@ -158,6 +196,13 @@ const Div = styled.div`
 
     @media (max-width:768px){
         width:580px;
+
+        .pokemon-types {
+            padding:5px;
+        }
+        .pokemon-types ul{
+            
+        }
     }
 
     @media (max-width:576px){
@@ -178,6 +223,18 @@ const Div = styled.div`
 
         .pokemon-name {
             font-size:14px;
+        }
+
+        .pokemon-types {
+            flex-direction:column;
+        }
+
+        .pokemon-types ul {
+            display:flex;
+            flex-direction:column;
+            margin:0;
+            padding:0;
+            margin-top: 10px;
         }
     }
 `
