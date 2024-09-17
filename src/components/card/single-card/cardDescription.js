@@ -6,7 +6,7 @@
 import styled from "styled-components"
 import { CardContext } from "../../../context/CardContext";
 import { useContext, useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
 
@@ -35,12 +35,10 @@ export const SingleCard = () => {
     const handleOnMouseMove = (e, index) => {
         const { clientX, clientY } = e;
         setTooltipPosition({ top: clientY, left: clientX, activeStatus: true, activeIndex: index })
-        //console.log('Name: ', card_name)
     }
     // Filtro de tipo de pokemon aqui na exibição
     const handleOnMouseLeave = () => {
         setTooltipPosition({ activeStatus: false, activeIndex: null });
-        //console.log('Mouse saiu da LI')
     }
 
     return (
@@ -99,7 +97,6 @@ const Container = styled.div`
     flex-direction:column;
     background: ${props => props.theme.backgroundImageDescription};
     background-size:cover;
-    //margin: 0 auto;
     font-family: 'Pixelify Sans',sans-serif;
 
     .btn-back {
@@ -181,7 +178,6 @@ const Div = styled.div`
 
         .pokemon-name {
             font-size:14px;
-            
         }
     }
 `
@@ -192,7 +188,6 @@ const Details = styled.div`
     grid-template-columns: repeat(2,1fr);
     border: 5px inset black;
     border-width:medium;
-    //height:256px;
     gap:10px;
     padding: 15px;
     margin-top:20px;
@@ -208,7 +203,6 @@ const Details = styled.div`
     }
 
     @media (max-width:576px){
-        
         width:200px;
         height:90px;
         flex-direction:row;
@@ -359,13 +353,11 @@ const Tooltip = styled.div`
 
     opacity: 0;
     display:none;
-    //justify-content:center;
     pointer-events:none;
     text-transform:none;
     width:250px;
     padding:10px;
     word-wrap:break-word;
-    //transform: translate(0,-110%);
     background-color:white;   
     
     &.active {

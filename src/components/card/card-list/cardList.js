@@ -50,7 +50,6 @@ export const CardList = () => {
         fetchData();
     }, [])
 
-
     // Usando a description_url para acessar o objeto card que fica dentro do retorno da função getCards()
 
     useEffect(() => {
@@ -58,9 +57,6 @@ export const CardList = () => {
             const objectData = await Promise.all(cards.loaded_pokemons.map(async (card) => {
                 const response = await fetch(card.description_url);
                 const data = await response.json();
-                //console.log("Nome : " + data.name)
-                //console.log("Sprite : " + data.sprites.front_default)
-                //console.log(data)
                 return await data;
             }))
 
@@ -79,8 +75,6 @@ export const CardList = () => {
 
     }, [cards.loaded_pokemons])
 
-
-
     async function getCards() {
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10&offset=0')
         const data = await response.json()
@@ -98,7 +92,6 @@ export const CardList = () => {
             name: card.name,
             description_url: card.url
         }));
-        //console.log(array_pokemons);
         return setCards(cards => ({
             ...cards,
             contador_cards: cards.contador_cards + 10,
@@ -146,18 +139,12 @@ export const CardList = () => {
         }
         filterState();
     }
-    const handleRenderCardClick = (card) => {
-        // Lista de movimentos (moves) data.moves[i].move.name e move.url
-        // Lista de habilidades (abilities) - Nome e descrição - Acessar a url da habilidade e pegar o atributo - effect_entries : effect. Como os pokemon's possuem mais de uma habilidade, é necessário que este atributo receba um array [habilidade,descricao_da_habilidade]. data.abilities[i].ability.name e .ability.url
-        // Tipo do pokemon (type) - https://pokeapi.co/api/v2/type/1/
-        // Imagem do pokemon - data.sprites
-        const card_url = cards.loaded_pokemons[card.id - 1].description_url
+    const handleRenderCardClick = (card) => {    
         const selectedCard = {
             ...card,
             activeStatus: true,
             sprite: card.sprites.front_default
         }
-        //console.log(selectedCard)
         setSelectedCard(selectedCard)
     }
     const handleOnMouseMove = (e, card_id, card_name) => {
@@ -169,12 +156,9 @@ export const CardList = () => {
             card_id: card_id,
             card_name: card_name
         })
-        //console.log('Name: ', card_name)
-    }
-    // Filtro de tipo de pokemon aqui na exibição
+    }   
     const handleOnMouseLeave = () => {
         setTooltipPosition(({ activeStatus: false }));
-        //console.log('Mouse saiu da LI')
     }
     function toggleClass(status) {
         console.log(status)
@@ -256,8 +240,7 @@ export const CardList = () => {
     )
 }
 
-//Cada <li> de tipo vai passar por parametro o nome do tipo atraves do onClick e o sera feito o .map do array loaded_pokemons, procurando o pokemon do tipo e listando na tela. Ao não possuir nenhum filtro, deve exibir todas as cartas. Utilizar um estado para guardar qual filtro esta sendo utilizado. 
-
+//Cada <li> de tipo vai passar por parametro o nome do tipo atraves do onClick e o sera feito o .map do array loaded_pokemons, procurando o pokemon do tipo e listando na tela. Ao não possuir nenhum filtro, deve exibir todas as cartas. 
 //Styled-components
 
 //Primeira página - Item Pokemon : estilizar :hover do pokemon exibindo o pokemon-id com uma transition, exibindo um balão de dialogo; ao clicar, aparecerá uma carta ao lado contendo o nome do pokemon e o botão more-details; 
@@ -265,7 +248,6 @@ export const CardList = () => {
 const Container = styled.div`
     display:flex;
     flex-direction:column;
-    //justify-content:center;
     width:100vw;
     min-height: 100vh;
     height:100%;
@@ -307,20 +289,11 @@ const Div = styled.div`
     display:flex;
     justify-content:center;
     align-self:center;
-    //gap:100px;
-    //flex-grow:1;
-    //margin-top:50px;
     padding-top:20px;
     width:100%;
     height:100%;
     max-height:768px;
     position:relative;
-
-
-    @media (max-width:575px){
-        gap: 0;
-        
-    }
 
 `
 const BoardCards = styled.div`
@@ -349,7 +322,6 @@ const BoardCards = styled.div`
         overflow-y:auto;
         scrollbar-width: thin; /* Define a largura da barra de rolagem como fina */
         scrollbar-color: #cfcfcf #ffffff; /* Define as cores do thumb e do trilho */
-        //gap:10px;
     }
     
     .item {
@@ -405,7 +377,6 @@ const BoardCards = styled.div`
         width:70px;
         position:relative;
         background-color:${props => props.theme.background};
-        //border-style: thin;
         border-color: ${props => props.theme.color};
         border-width:3px;
         border-radius:5px;
@@ -424,7 +395,6 @@ const BoardCards = styled.div`
         padding:5px;
         margin:0 auto;
         left:100%;
-        //bottom:100%;
         border-radius:5px;
     }
 
@@ -551,7 +521,6 @@ const BoardCards = styled.div`
                 width:5px;
                 height:100%;
                 background-color:white;
-                //transform-origin:center;
             }
 
             .x-shape::before {
@@ -669,12 +638,6 @@ const ExibitionCard = styled.div`
             color:inherit;
             z-index:3;
         }
-
-        @media (max-width:830px){
-            img {
-                
-            }
-        }
         
     }
 
@@ -694,7 +657,6 @@ const Tooltip = styled.div`
     border-radius:5px;
     white-space:no-wrap;
     pointer-events:none;
-    //transform:translate(0,100px)
     
 
     &.active {
@@ -712,6 +674,7 @@ const Tooltip = styled.div`
         border-width: 10px;
         border-style: dotted;
         border-color: transparent transparent transparent black; /* Define a cor da seta */
+        
         //Adicionando uma animação para a seta
         animation: moveUpDown 1.5s ease-in-out infinite
     }
