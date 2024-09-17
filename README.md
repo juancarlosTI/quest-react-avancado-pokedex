@@ -2,15 +2,15 @@
 
 O seguinte projeto utiliza de uma API RESTful (https://pokeapi.co/) para listar uma lista de cartas e as características individuais de cada carta.
 
-# Principais funcionalidades
+# Funcionalidades
 
 1. cardList.js  
-a) getCards() - função que faz uma requisição 
-b) loadMoreCards()  
-c) handleRenderCardClick()
+a) getCards() - faz uma requisição GET para a API e retorna um array que armazena as cartas simples.    
+b) loadMoreCards()  - faz uma requisição GET para a API , utilizando uma variável para alterar o off-set da requisição e captar as cartas posteriores. ( Não utilizar o off-set resulta em uma requisição GET que retorna as mesmas cartas da lista de cartas da API.)    
+c) handleRenderCardClick() - abre uma seção da página inicial, que renderiza uma pré-visualização da imagem do pokémon, junto a uma pokedéx.
 
-3. cardDescription  
-   a) getAbilities()
+2. cardDescription.js  
+   a) getAbilities() - 
 
 # Ferramentas utilizadas
 
