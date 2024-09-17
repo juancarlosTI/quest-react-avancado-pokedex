@@ -14,7 +14,7 @@ O seguinte projeto utiliza de uma API RESTful (https://pokeapi.co/) para listar 
 
 # Ferramentas utilizadas
 
-useState - React
+useState - React \n
 useContext- React
 styled-components - React - Para modularizar cada peça de código css com seu respectivo componente.
 
