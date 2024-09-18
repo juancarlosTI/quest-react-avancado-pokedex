@@ -32,7 +32,7 @@ Compartilhamento de recursos -
 Filtragem dos tipos - Para contornar os problemas de duplicação de cartas (que acontece pelo fato de um pokémon pode ter mais de um 'type'), foi utilizado um filtro de ocorrências, limitando a ocorrência da carta dentro do array que exibe as cartas filtradas, para evitar problemas de chaves primárias duplicadas.
 
 
-Modularização - Dividi a página por seções, que utilizaram o styled-components para utilizar as div's (separadas por classe) que faziam parte de cada seção e seção em si. Simplificou a manutenção, principalmente na hora de fazer a responsividade das @media-queries menores (768px,575px). Não consegui fazer o contexto para compartilhar o estado [tooltipPosition]. Ao passar o objeto estruturado para o contexto que não contém uma estrutura prévia, o 'tooltip.activeStatus' presente dentro das tag's <li> de listagem das cartas não consegue ser interpretado. 
+Modularização - Dividi a página por seções, que utilizaram o styled-components para utilizar as div's (separadas por classe) que faziam parte de cada seção e seção em si. Simplificou a manutenção, principalmente na hora de fazer a responsividade das @media-queries menores (768px,575px). Não consegui fazer o contexto para compartilhar o estado [tooltipPosition]. Ao passar o objeto estruturado para o contexto que não contém uma estrutura prévia, o 'tooltip.activeStatus' presente dentro das tag's 'li' de listagem das cartas não consegue ser interpretado. 
 
 Página inicial '/' 
     - Ao abrir a página, já é carregado as 10 primeiras cartas. Para que se tenha acesso aos atributos individuais de cada carta, é necessário que sejam feito 2 fetchs. O primeiro vai ser responsável por trazer uma carta com 2 atributos simples (name, description_url) e foi salvo em um atributo (loaded_pokemons) que faz parte do estado [cards]. O segundo é responsável por abrir cada objeto de [cards.loaded_pokemons] , para conseguir ter acesso aos demais atributos a partir do description_url. Portanto, para mantêr a organização e não ter uma complexidade grande na substituição das cartas simples (name, description_url) por cartas complexas ( que possuem todos os atributos detalhados ), criei um novo array (pokemon_details), que possui todas as cartas com detalhes complexos (type, moves, abilities, sprites...). Dessa forma, a partir da listagem do array [pokemon_details] é realizada a exibição das imagens frontais de cada carta (o que não seria possível com as cartas simples).
@@ -44,8 +44,12 @@ Página inicial '/'
 Página detalhada '/card/{id}' 
     - Exibe os atributos do objetos (fotos, movimentos, habilidades) na forma de lista.  
 
-Design - A listagem foi o foco do design. O cursor do mouse interage com a listagem das cartas na página principal, que exibe o nome das cartas, e nas listas de detalhamento de movimento e habilidades . Quanto as listas de detalhamentos, o mouse interage com a lista de movimentos de forma simples, alterando a cor da <li> e as <li>'s da lista de habilidade se abrem quando o cursor está na sua área. 
+Design - A listagem foi o foco do design. O cursor do mouse interage com a listagem das cartas na página principal, que exibe o nome das cartas, e nas listas de detalhamento de movimento e habilidades . Quanto as listas de detalhamentos, o mouse interage com a lista de movimentos de forma simples, e na de habilidades, abre uma caixa de diálogo contendo a descrição da habilidade.
 
 
 
 # Como utilizar - Passo a passo
+
+1 . Fazer download (pelo navegador) ou 'git clone' no seu PC; abra o 'cmd do windows' ou 'git bash' e digite **npm install** (para instalar as dependências).
+2 . Ao terminar o download, abra o projeto com o seu editor de código e digite **npm start**.
+
