@@ -55,21 +55,22 @@ export const SingleCard = () => {
                                 Name: <br />
                                 {selectedCard.name}
                             </p>
-                            <p className="pokemon-types">
-                                Types: <br />
-                                <ul>
-                                    {selectedCard.types.map((type, index) => (
+                            
+                            <ul>
+                                <p className="pokemon-types">
+                                    Types: <br />
+                                </p>
+                                {selectedCard.types.map((type, index) => (
 
-                                        <React.Fragment key={type.type.name}>
-                                            <li>
-                                                {type.type.name}
-                                                <br />
-                                            </li>
-                                        </React.Fragment>
+                                    <React.Fragment key={type.type.name}>
+                                        <li>
+                                            {type.type.name}
+                                            <br />
+                                        </li>
+                                    </React.Fragment>
 
-                                    ))}
-                                </ul>
-                            </p>
+                                ))}
+                            </ul>
                         </div>
 
                     </div>
@@ -150,6 +151,7 @@ const Div = styled.div`
         border: 5px inset black;
         border-radius:6px;
         border-width:medium;
+        margin-left:10px;
     }
 
     .pokemon-image img {
@@ -172,16 +174,21 @@ const Div = styled.div`
         padding-left:5px;
         margin-top:10px;
         font-size:12px;
-        border:1px inset grey;
+        
+    }
+
+    .pokemon-info {
+        display:flex;
+        padding:5px;
     }
     
-    .pokemon-types ul {
+    .pokemon-info ul {
         list-style-type:none;
         padding-left:20px;
         margin:2px;
     }
 
-    .pokemon-types ul li::first-letter{
+    .pokemon-info ul li::first-letter{
         text-transform: uppercase;
     }
 
@@ -213,6 +220,7 @@ const Div = styled.div`
         .pokemon-image {
             flex-direction: row;
             padding: 0 10px;
+            margin:0;
             
         }
 
@@ -225,11 +233,12 @@ const Div = styled.div`
             font-size:14px;
         }
 
-        .pokemon-types {
+        .pokemon-info {
             flex-direction:column;
+            padding:0;
         }
 
-        .pokemon-types ul {
+        .pokemon-info ul {
             display:flex;
             flex-direction:column;
             margin:0;
