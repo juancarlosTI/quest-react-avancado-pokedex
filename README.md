@@ -44,8 +44,12 @@ Página inicial '/'
 Página detalhada '/card/{id}' 
     - Exibe os atributos do objetos (fotos, movimentos, habilidades) na forma de lista.  
 
-Design - A listagem foi o foco do design. O cursor do mouse interage com a listagem das cartas na página principal, que exibe o nome das cartas, e nas listas de detalhamento de movimento e habilidades . Quanto as listas de detalhamentos, o mouse interage com a lista de movimentos de forma simples, alterando a cor da <li> e as <li>'s da lista de habilidade se abrem quando o cursor está na sua área. 
+Design - A listagem foi o foco do design. O cursor do mouse interage com a listagem das cartas na página principal, que exibe o nome das cartas, e nas listas de detalhamento de movimento e habilidades . Quanto as listas de detalhamentos, o mouse interage com a lista de movimentos de forma simples, e na de habilidades, abre uma caixa de diálogo contendo a descrição da habilidade.
 
 
 
 # Como utilizar - Passo a passo
+
+1 . Fazer download (pelo navegador) ou 'git clone' no seu PC; abra o 'cmd do windows' ou 'git bash' e digite **npm install** (para instalar as dependências).
+2 . Ao terminar o download, abra o projeto com o seu editor de código e digite **npm start**.
+
